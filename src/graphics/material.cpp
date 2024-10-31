@@ -85,6 +85,31 @@ StandardMaterial::StandardMaterial(glm::vec4 color)
 
 StandardMaterial::~StandardMaterial() { }
 
+MaterialHomogeneous::MaterialHomogeneous(glm::vec4 color)
+{
+	this->color = color;
+	this->base_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/volume.fs");
+	this->normal_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/normal.fs");
+	this->shader = this->base_shader;
+}
+
+void MaterialHomogeneous::setUniforms(Camera* camera, glm::mat4 model)
+{
+	//upload node uniforms
+	this->shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
+	this->shader->setUniform("u_camera_position", camera->eye);
+	this->shader->setUniform("u_model", model);
+
+	this->shader->setUniform("u_color", this->color);
+
+	// ABS COEF
+	this->shader->setUniform("u_abs_coef", this->absorption_coef);
+
+	if (this->texture) {
+		this->shader->setUniform("u_texture", this->texture);
+	}
+}
+
 void StandardMaterial::setUniforms(Camera* camera, glm::mat4 model)
 {
 	//upload node uniforms
@@ -122,6 +147,7 @@ void StandardMaterial::render(Mesh* mesh, glm::mat4 model, Camera* camera)
 				glDepthFunc(GL_LEQUAL);
 			}
 			this->shader->setUniform("u_ambient_light", Application::instance->ambient_light * (float)first_pass);
+			this->shader->setUniform("u_background_light", Application::instance->background_light);
 
 			if (num_lights > 0) {
 				Light* light = Application::instance->light_list[nlight];

@@ -57,3 +57,14 @@ public:
 	void render(Mesh* mesh, glm::mat4 model, Camera* camera);
 	void renderInMenu();
 };
+
+class MaterialHomogeneous : public StandardMaterial {
+public:
+
+	MaterialHomogeneous(glm::vec4 color = glm::vec4(1.f));
+
+	void setUniforms(Camera* camera, glm::mat4 model);
+
+	float absorption_coef = 0.9;
+
+};
