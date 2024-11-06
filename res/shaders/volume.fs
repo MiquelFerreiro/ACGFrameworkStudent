@@ -36,7 +36,7 @@ void main()
     float tNear = max(max(t1.x, t1.y), t1.z);
     float tFar = min(min(t2.x, t2.y), t2.z);
 
-	float transmittance = exp(-u_abs_coef*(-tNear + tFar));
+	float transmittance = exp(-u_abs_coef*(tFar - tNear));
 
 	FragColor = u_background_light * transmittance;
 }

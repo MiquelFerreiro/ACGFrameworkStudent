@@ -93,7 +93,55 @@ MaterialHomogeneous::MaterialHomogeneous(glm::vec4 color)
 	this->shader = this->base_shader;
 }
 
+
+MaterialHeterogeneous::MaterialHeterogeneous(glm::vec4 color)
+{
+	this->color = color;
+	this->base_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/heterogeneous.fs");
+	this->normal_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/normal.fs");
+	this->shader = this->base_shader;
+}
+
+EmissiveAbsorption::EmissiveAbsorption(glm::vec4 color)
+{
+	this->color = color;
+	this->base_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/emissive-absorption.fs");
+	this->normal_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/normal.fs");
+	this->shader = this->base_shader;
+}
+
 void MaterialHomogeneous::setUniforms(Camera* camera, glm::mat4 model)
+{
+	//upload node uniforms
+	this->shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
+	this->shader->setUniform("u_camera_position", camera->eye);
+	this->shader->setUniform("u_model", model);
+
+	this->shader->setUniform("u_color", this->color);
+
+	// ABS COEF
+	this->shader->setUniform("u_abs_coef", this->absorption_coef);
+
+	if (this->texture) {
+		this->shader->setUniform("u_texture", this->texture);
+	}
+}
+
+void MaterialHeterogeneous::setUniforms(Camera* camera, glm::mat4 model)
+{
+	//upload node uniforms
+	this->shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
+	this->shader->setUniform("u_camera_position", camera->eye);
+	this->shader->setUniform("u_model", model);
+
+	this->shader->setUniform("u_color", this->color);
+
+	if (this->texture) {
+		this->shader->setUniform("u_texture", this->texture);
+	}
+}
+
+void EmissiveAbsorption::setUniforms(Camera* camera, glm::mat4 model)
 {
 	//upload node uniforms
 	this->shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
@@ -183,4 +231,40 @@ void StandardMaterial::renderInMenu()
 	}
 
 	if (!this->show_normals) ImGui::ColorEdit3("Color", (float*)&this->color);
+}
+
+void MaterialHomogeneous::renderInMenu()
+{
+	if (ImGui::Checkbox("Show Normals", &this->show_normals)) {
+		if (this->show_normals) {
+			this->shader = this->normal_shader;
+		}
+		else {
+			this->shader = this->base_shader;
+		}
+	}
+
+	if (!this->show_normals) ImGui::ColorEdit3("Color", (float*)&this->color);
+
+
+	ImGui::DragFloat("Absorption Coefficient", (float*)&this->absorption_coef, 0.05f);
+
+}
+
+void MaterialHeterogeneous::renderInMenu()
+{
+	if (ImGui::Checkbox("Show Normals", &this->show_normals)) {
+		if (this->show_normals) {
+			this->shader = this->normal_shader;
+		}
+		else {
+			this->shader = this->base_shader;
+		}
+	}
+
+	if (!this->show_normals) ImGui::ColorEdit3("Color", (float*)&this->color);
+
+
+	//ImGui::DragFloat("Absorption Coefficient", (float*)&this->absorption_coef, 0.05f);
+
 }

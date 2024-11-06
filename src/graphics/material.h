@@ -65,6 +65,30 @@ public:
 
 	void setUniforms(Camera* camera, glm::mat4 model);
 
+	void renderInMenu();
+
+	float absorption_coef = 0.9;
+
+};
+
+class MaterialHeterogeneous : public StandardMaterial {
+public:
+
+	MaterialHeterogeneous(glm::vec4 color = glm::vec4(1.f));
+
+	void setUniforms(Camera* camera, glm::mat4 model);
+
+	void renderInMenu();
+
+};
+
+class EmissiveAbsorption : public StandardMaterial {
+public:
+
+	EmissiveAbsorption(glm::vec4 color = glm::vec4(1.f));
+
+	void setUniforms(Camera* camera, glm::mat4 model);
+
 	float absorption_coef = 0.9;
 
 };

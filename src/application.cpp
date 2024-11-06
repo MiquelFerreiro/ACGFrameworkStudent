@@ -1,5 +1,7 @@
 #include "application.h"
 
+#include <algorithm>
+
 bool render_wireframe = false;
 Camera* Application::camera = nullptr;
 
@@ -24,17 +26,28 @@ void Application::init(GLFWwindow* window)
     this->background_light = glm::vec4(0.1f, 0.3f, 0.3f, 1.f);
 
 
-    /* ADD NODES TO THE SCENE 
+
     SceneNode* example = new SceneNode();
     example->mesh = Mesh::Get("res/meshes/cube.obj");
     example->material = new StandardMaterial();
     this->node_list.push_back(example);
-    */
 
-    VolumeNode* example = new VolumeNode();
-    example->mesh = Mesh::Get("res/meshes/cube.obj");
-    example->material = new MaterialHomogeneous();
-    this->node_list.push_back(example);
+
+    VolumeNode* volume = new VolumeNode();
+    volume->mesh = Mesh::Get("res/meshes/cube.obj");
+    volume->material = new MaterialHomogeneous();
+    this->node_list.push_back(volume);
+
+
+    VolumeNode* heterogeneous = new VolumeNode();
+    heterogeneous->mesh = Mesh::Get("res/meshes/cube.obj");
+    heterogeneous->material = new MaterialHeterogeneous();
+    this->node_list.push_back(heterogeneous);
+
+    VolumeNode* emissive_abs = new VolumeNode();
+    emissive_abs->mesh = Mesh::Get("res/meshes/cube.obj");
+    emissive_abs->material = new EmissiveAbsorption();
+    this->node_list.push_back(emissive_abs);
 }
 
 void Application::update(float dt)
@@ -59,12 +72,19 @@ void Application::render()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
-    for (unsigned int i = 0; i < this->node_list.size(); i++)
+    /*for (unsigned int i = 0; i < this->node_list.size(); i++)
     {
+        
+
         this->node_list[i]->render(this->camera);
 
         if (this->flag_wireframe) this->node_list[i]->renderWireframe(this->camera);
-    }
+    }*/
+
+   
+    this->node_list[this->current_idx]->render(this->camera);
+
+    if (this->flag_wireframe) this->node_list[this->current_idx]->renderWireframe(this->camera);
 
     // Draw the floor grid
     if (this->flag_grid) drawGrid();
@@ -74,13 +94,15 @@ void Application::renderGUI()
 {
     if (ImGui::TreeNodeEx("Scene", ImGuiTreeNodeFlags_DefaultOpen))
     {
+
+        ////CHANGE NODE TO RENDER
+        //ImGui::DragInt("Node To Render", &this->current_idx, 1.0f, 0, node_list.size()-1);
+
         ImGui::ColorEdit3("Ambient light", (float*)&this->ambient_light);
         ImGui::ColorEdit3("Background light", (float*)&this->background_light);
 
-        //Material* mat = this->node_list[0]->material;
-        //ImGui::ColorEdit3("Background light", (float*));
 
-        //ImGui::ColorEdit3("Absorption Coefficient", this->node_list.);
+        ImGui::DragInt("Node to Render", &this->current_idx, 0.005f, 0, this->node_list.size()-1);
 
         if (ImGui::TreeNode("Camera")) {
             this->camera->renderInMenu();
