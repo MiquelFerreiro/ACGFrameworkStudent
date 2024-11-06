@@ -58,37 +58,26 @@ public:
 	void renderInMenu();
 };
 
-class MaterialHomogeneous : public StandardMaterial {
+class VolumeMaterial : public StandardMaterial {
 public:
 
-	MaterialHomogeneous(glm::vec4 color = glm::vec4(1.f));
+	int current_shader = 3;
+
+	Shader* abs_hom_shader = NULL;
+	Shader* abs_het_shader = NULL;
+	Shader* emi_abs_shader = NULL;
+
+	float absorption_coef = 1.0f;
+	float step_length = 0.05f;
+	float noise_scale = 2.5f;
+	float noise_detail = 5.0f;
+
+
+	VolumeMaterial(glm::vec4 color = glm::vec4(1.f));
 
 	void setUniforms(Camera* camera, glm::mat4 model);
 
 	void renderInMenu();
 
-	float absorption_coef = 0.9;
-
-};
-
-class MaterialHeterogeneous : public StandardMaterial {
-public:
-
-	MaterialHeterogeneous(glm::vec4 color = glm::vec4(1.f));
-
-	void setUniforms(Camera* camera, glm::mat4 model);
-
-	void renderInMenu();
-
-};
-
-class EmissiveAbsorption : public StandardMaterial {
-public:
-
-	EmissiveAbsorption(glm::vec4 color = glm::vec4(1.f));
-
-	void setUniforms(Camera* camera, glm::mat4 model);
-
-	float absorption_coef = 0.9;
 
 };

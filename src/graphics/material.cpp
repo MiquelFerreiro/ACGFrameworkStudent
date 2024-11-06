@@ -6,6 +6,7 @@
 #include <fstream>
 #include <algorithm>
 
+/////////////////////////// BASE MATERIALS ///////////////////////////
 
 FlatMaterial::FlatMaterial(glm::vec4 color)
 {
@@ -85,79 +86,6 @@ StandardMaterial::StandardMaterial(glm::vec4 color)
 
 StandardMaterial::~StandardMaterial() { }
 
-MaterialHomogeneous::MaterialHomogeneous(glm::vec4 color)
-{
-	this->color = color;
-	this->base_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/volume.fs");
-	this->normal_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/normal.fs");
-	this->shader = this->base_shader;
-}
-
-
-MaterialHeterogeneous::MaterialHeterogeneous(glm::vec4 color)
-{
-	this->color = color;
-	this->base_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/heterogeneous.fs");
-	this->normal_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/normal.fs");
-	this->shader = this->base_shader;
-}
-
-EmissiveAbsorption::EmissiveAbsorption(glm::vec4 color)
-{
-	this->color = color;
-	this->base_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/emissive-absorption.fs");
-	this->normal_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/normal.fs");
-	this->shader = this->base_shader;
-}
-
-void MaterialHomogeneous::setUniforms(Camera* camera, glm::mat4 model)
-{
-	//upload node uniforms
-	this->shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
-	this->shader->setUniform("u_camera_position", camera->eye);
-	this->shader->setUniform("u_model", model);
-
-	this->shader->setUniform("u_color", this->color);
-
-	// ABS COEF
-	this->shader->setUniform("u_abs_coef", this->absorption_coef);
-
-	if (this->texture) {
-		this->shader->setUniform("u_texture", this->texture);
-	}
-}
-
-void MaterialHeterogeneous::setUniforms(Camera* camera, glm::mat4 model)
-{
-	//upload node uniforms
-	this->shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
-	this->shader->setUniform("u_camera_position", camera->eye);
-	this->shader->setUniform("u_model", model);
-
-	this->shader->setUniform("u_color", this->color);
-
-	if (this->texture) {
-		this->shader->setUniform("u_texture", this->texture);
-	}
-}
-
-void EmissiveAbsorption::setUniforms(Camera* camera, glm::mat4 model)
-{
-	//upload node uniforms
-	this->shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
-	this->shader->setUniform("u_camera_position", camera->eye);
-	this->shader->setUniform("u_model", model);
-
-	this->shader->setUniform("u_color", this->color);
-
-	// ABS COEF
-	this->shader->setUniform("u_abs_coef", this->absorption_coef);
-
-	if (this->texture) {
-		this->shader->setUniform("u_texture", this->texture);
-	}
-}
-
 void StandardMaterial::setUniforms(Camera* camera, glm::mat4 model)
 {
 	//upload node uniforms
@@ -172,6 +100,21 @@ void StandardMaterial::setUniforms(Camera* camera, glm::mat4 model)
 	}
 }
 
+void StandardMaterial::renderInMenu()
+{
+	if (ImGui::Checkbox("Show Normals", &this->show_normals)) {
+		if (this->show_normals) {
+			this->shader = this->normal_shader;
+		}
+		else {
+			this->shader = this->base_shader;
+		}
+	}
+
+	if (!this->show_normals) ImGui::ColorEdit3("Color", (float*)&this->color);
+}
+
+// Update Ambient/Background Light Here
 void StandardMaterial::render(Mesh* mesh, glm::mat4 model, Camera* camera)
 {
 	bool first_pass = true;
@@ -194,6 +137,7 @@ void StandardMaterial::render(Mesh* mesh, glm::mat4 model, Camera* camera)
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 				glDepthFunc(GL_LEQUAL);
 			}
+
 			this->shader->setUniform("u_ambient_light", Application::instance->ambient_light * (float)first_pass);
 			this->shader->setUniform("u_background_light", Application::instance->background_light);
 
@@ -217,54 +161,102 @@ void StandardMaterial::render(Mesh* mesh, glm::mat4 model, Camera* camera)
 		// disable shader
 		this->shader->disable();
 	}
+} 
+
+
+//////////////////////////////////////////// NEW STUFF ////////////////////////////////////////////
+
+
+VolumeMaterial::VolumeMaterial(glm::vec4 color)
+{
+	this->color = color;
+	this->base_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/basic.fs");
+	this->normal_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/normal.fs");
+	this->abs_hom_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/homogeneous.fs");
+	this->abs_het_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/heterogeneous.fs");
+	this->emi_abs_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/emissive_absorption.fs");
+
+	//Choose initial shader
+	
+	switch (this->current_shader) {
+	case 0:
+		this->shader = this->base_shader;
+		break;
+	case 1:
+		this->shader = this->normal_shader;
+		break;
+	case 2:
+		this->shader = this->abs_hom_shader;
+		break;
+	case 3:
+		this->shader = this->abs_het_shader;
+		break;
+	case 4:
+		this->shader = this->emi_abs_shader;  // Ensure this shader is properly initialized
+		break;
+	}
 }
 
-void StandardMaterial::renderInMenu()
+void VolumeMaterial::setUniforms(Camera* camera, glm::mat4 model)
 {
-	if (ImGui::Checkbox("Show Normals", &this->show_normals)) {
-		if (this->show_normals) {
-			this->shader = this->normal_shader;
-		}
-		else {
-			this->shader = this->base_shader;
-		}
+	//upload node uniforms
+	this->shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
+	this->shader->setUniform("u_camera_position", camera->eye);
+	this->shader->setUniform("u_model", model);
+
+	if (this->texture) {
+		this->shader->setUniform("u_texture", this->texture);
 	}
 
-	if (!this->show_normals) ImGui::ColorEdit3("Color", (float*)&this->color);
+	this->shader->setUniform("u_color", this->color);
+
+	// ABS COEF
+	this->shader->setUniform("u_abs_coef", this->absorption_coef);
+
+	// STEP LENGTH
+	this->shader->setUniform("u_step_length", this->step_length);
+
+	// NOISE SCALE
+	this->shader->setUniform("u_noise_scale", this->noise_scale);
+
+	// NOISE DETAIL
+	this->shader->setUniform("u_noise_detail", this->noise_detail);
+	
 }
 
-void MaterialHomogeneous::renderInMenu()
+
+void VolumeMaterial::renderInMenu()
 {
-	if (ImGui::Checkbox("Show Normals", &this->show_normals)) {
-		if (this->show_normals) {
-			this->shader = this->normal_shader;
-		}
-		else {
+	// Switch between Shaders
+
+	if (ImGui::Combo("Shader Type", &this->current_shader, "Base\0Normal\0Homogeneous\0Heterogeneous\0Emission-Absorption")) {
+	
+		switch (this->current_shader) {
+		case 0:
 			this->shader = this->base_shader;
+			break;
+		case 1:
+			this->shader = this->normal_shader;
+			break;
+		case 2:
+			this->shader = this->abs_hom_shader;
+			break;
+		case 3:
+			this->shader = this->abs_het_shader;
+			break;
+		case 4:
+			this->shader = this->emi_abs_shader;  // Ensure this shader is properly initialized
+			break;
 		}
 	}
-
 	if (!this->show_normals) ImGui::ColorEdit3("Color", (float*)&this->color);
 
+	ImGui::DragFloat("Absorption Coefficient", (float*)&this->absorption_coef, 0.025f, 0);
 
-	ImGui::DragFloat("Absorption Coefficient", (float*)&this->absorption_coef, 0.05f);
+	ImGui::DragFloat("Step Length", (float*)&this->step_length, 0.0005f, 0.0001f);
 
-}
+	ImGui::DragFloat("Noise Scale", (float*)&this->noise_scale, 0.1f, 0.5);
 
-void MaterialHeterogeneous::renderInMenu()
-{
-	if (ImGui::Checkbox("Show Normals", &this->show_normals)) {
-		if (this->show_normals) {
-			this->shader = this->normal_shader;
-		}
-		else {
-			this->shader = this->base_shader;
-		}
-	}
-
-	if (!this->show_normals) ImGui::ColorEdit3("Color", (float*)&this->color);
-
-
-	//ImGui::DragFloat("Absorption Coefficient", (float*)&this->absorption_coef, 0.05f);
+	ImGui::DragFloat("Noise Detail", (float*)&this->noise_detail, 0.1f, 0.5);
 
 }

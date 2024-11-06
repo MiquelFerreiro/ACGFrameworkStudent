@@ -9,6 +9,8 @@ uniform vec3 u_camera_position;
 uniform vec4 u_ambient_light;
 uniform vec4 u_background_light;
 
+uniform vec4 u_color;
+
 uniform float u_abs_coef;
 
 uniform float u_step_length;
@@ -80,8 +82,6 @@ float cnoise( vec3 P, float scale, float detail )
     return clamp(fractal_noise(P, detail), 0.0, 1.0);
 }
 
-//MAIN
-
 void main() {
 
     vec3 rayOrigin = u_camera_position;
@@ -101,24 +101,28 @@ void main() {
     // Initialize variables
     float thickness = 0.0;
     vec3 position = rayOrigin + tNear * rayDir;
+    vec3 accumulated_radiance = vec3(0.0);
+    float accumulated_transmittance = 1.0;
 
-    // Ray-marching loop
+    // Ray-marching loop for emission-absorption
     for (float t = tNear; t < tFar; t += u_step_length) {
-        float density = 0;
-        //density += noise(position);
-        density += cnoise(position, u_noise_scale, u_noise_detail);
-        //density += fractal_noise(position, u_noise_detail);
-
+        //float density = noise(position * u_noise_scale);
+        float density = noise(position) + cnoise(position, u_noise_scale, u_noise_detail) + fractal_noise(position, u_noise_detail);
         float absorption = density * u_abs_coef;
 
-        // Accumulate optical thickness
-        thickness += absorption * u_step_length;
+        // Transmittance at this step
+        float step_transmittance = exp(-absorption * u_step_length);
+        
+        // Accumulate emitted radiance
+        accumulated_radiance += accumulated_transmittance * step_transmittance * u_color.rgb * density;
+
+        // Update accumulated transmittance
+        accumulated_transmittance *= step_transmittance;
 
         // Advance position along the ray
         position += rayDir * u_step_length;
     }
 
-    // Compute transmittance and final color
-    float transmittance = exp(-thickness);
-    FragColor = u_background_light * transmittance;
+    // Combine accumulated radiance with background color
+    FragColor = vec4(accumulated_radiance + u_background_light.rgb * accumulated_transmittance, 1.0);
 }

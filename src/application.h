@@ -18,8 +18,6 @@ public:
 	glm::vec4 background_light;
 	std::vector<Light*> light_list;
 
-	int current_idx = 3;
-
 	int window_width;
 	int window_height;
 

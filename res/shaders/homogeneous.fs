@@ -6,16 +6,10 @@ in vec3 v_normal;
 
 uniform vec3 u_camera_position;
 
-uniform vec4 u_color;
 uniform vec4 u_ambient_light;
-
-uniform vec3 u_light_position;
-uniform vec4 u_light_color;
-uniform float u_light_intensity;
-uniform float u_light_shininess;
+uniform vec4 u_background_light;
 
 uniform float u_abs_coef;
-uniform vec4 u_background_light;
 
 out vec4 FragColor;
 

@@ -32,8 +32,8 @@ public:
 	virtual void renderWireframe(Camera* camera);
 	virtual void renderInMenu();
 };
-
-class VolumeNode : public SceneNode{
-public:
-
-};
+//
+//class VolumeNode : public SceneNode{
+//public:
+//
+//};
