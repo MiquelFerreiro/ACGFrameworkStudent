@@ -100,29 +100,33 @@ void main() {
 
     // Initialize variables
     float thickness = 0.0;
+
     vec3 position = rayOrigin + tNear * rayDir;
-    vec3 accumulated_radiance = vec3(0.0);
-    float accumulated_transmittance = 1.0;
+
+    vec4 sum = vec4(0);
+
+    float density = 0;
 
     // Ray-marching loop for emission-absorption
     for (float t = tNear; t < tFar; t += u_step_length) {
-        //float density = noise(position * u_noise_scale);
-        float density = noise(position) + cnoise(position, u_noise_scale, u_noise_detail) + fractal_noise(position, u_noise_detail);
+
+        density = cnoise(position, u_noise_scale, u_noise_detail);
+
         float absorption = density * u_abs_coef;
 
-        // Transmittance at this step
-        float step_transmittance = exp(-absorption * u_step_length);
+        float transmittance = exp(-absorption * u_step_length);
         
-        // Accumulate emitted radiance
-        accumulated_radiance += accumulated_transmittance * step_transmittance * u_color.rgb * density;
+        vec4 radiance = absorption * u_color;
 
-        // Update accumulated transmittance
-        accumulated_transmittance *= step_transmittance;
+        sum += transmittance * radiance * u_step_length;
 
         // Advance position along the ray
         position += rayDir * u_step_length;
+
+        // For calculating T(0,t)
+        thickness += absorption * u_step_length;
     }
 
     // Combine accumulated radiance with background color
-    FragColor = vec4(accumulated_radiance + u_background_light.rgb * accumulated_transmittance, 1.0);
+    FragColor = sum + u_background_light * exp(-thickness);
 }

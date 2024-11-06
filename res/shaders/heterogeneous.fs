@@ -100,14 +100,15 @@ void main() {
 
     // Initialize variables
     float thickness = 0.0;
+
     vec3 position = rayOrigin + tNear * rayDir;
+
+    float density = 0;
 
     // Ray-marching loop
     for (float t = tNear; t < tFar; t += u_step_length) {
-        float density = 0;
-        //density += noise(position);
-        density += cnoise(position, u_noise_scale, u_noise_detail);
-        //density += fractal_noise(position, u_noise_detail);
+
+        density = cnoise(position, u_noise_scale, u_noise_detail);
 
         float absorption = density * u_abs_coef;
 

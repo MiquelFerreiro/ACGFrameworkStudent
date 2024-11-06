@@ -221,7 +221,7 @@ void VolumeMaterial::setUniforms(Camera* camera, glm::mat4 model)
 
 	// NOISE DETAIL
 	this->shader->setUniform("u_noise_detail", this->noise_detail);
-	
+
 }
 
 
@@ -249,11 +249,12 @@ void VolumeMaterial::renderInMenu()
 			break;
 		}
 	}
+
 	if (!this->show_normals) ImGui::ColorEdit3("Color", (float*)&this->color);
 
 	ImGui::DragFloat("Absorption Coefficient", (float*)&this->absorption_coef, 0.025f, 0);
 
-	ImGui::DragFloat("Step Length", (float*)&this->step_length, 0.0005f, 0.0001f);
+	ImGui::DragFloat("Step Length", (float*)&this->step_length, 0.0005f, 0.005f);
 
 	ImGui::DragFloat("Noise Scale", (float*)&this->noise_scale, 0.1f, 0.5);
 

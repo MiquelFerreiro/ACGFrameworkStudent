@@ -22,8 +22,11 @@ void Application::init(GLFWwindow* window)
     this->flag_grid = true;
     this->flag_wireframe = false;
 
-    this->ambient_light = glm::vec4(0.75f, 0.75f, 0.75f, 1.f);
-    this->background_light = glm::vec4(0.1f, 0.3f, 0.3f, 1.f);
+    this->ambient_light = glm::vec4(1, 1, 1, 1.0f);
+
+    //this->background_light = glm::vec4(219 / 255.0f, 237 / 255.0f, 242 / 255.0f, 1.0f);
+    this->background_light = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+
 
 
     
@@ -36,6 +39,9 @@ void Application::init(GLFWwindow* window)
     SceneNode* volume = new SceneNode("Volume Node");
     volume->mesh = Mesh::Get("res/meshes/cube.obj");
     volume->material = new VolumeMaterial();
+
+    volume->material->color = glm::vec4(151/255.0f, 57/255.0f, 196/255.0f, 1.0f);
+
     this->node_list.push_back(volume);
 }
 

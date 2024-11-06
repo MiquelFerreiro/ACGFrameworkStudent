@@ -61,13 +61,13 @@ public:
 class VolumeMaterial : public StandardMaterial {
 public:
 
-	int current_shader = 3;
+	int current_shader = 4;
 
 	Shader* abs_hom_shader = NULL;
 	Shader* abs_het_shader = NULL;
 	Shader* emi_abs_shader = NULL;
 
-	float absorption_coef = 1.0f;
+	float absorption_coef = 2.0f;
 	float step_length = 0.05f;
 	float noise_scale = 2.5f;
 	float noise_detail = 5.0f;
