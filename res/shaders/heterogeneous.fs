@@ -119,7 +119,6 @@ void main() {
         position += rayDir * u_step_length;
     }
 
-    // Compute transmittance and final color
     float transmittance = exp(-thickness);
     FragColor = u_background_light * transmittance;
 }

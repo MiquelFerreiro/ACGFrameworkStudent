@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+
 bool render_wireframe = false;
 Camera* Application::camera = nullptr;
 
@@ -24,25 +25,49 @@ void Application::init(GLFWwindow* window)
 
     this->ambient_light = glm::vec4(1, 1, 1, 1.0f);
 
-    //this->background_light = glm::vec4(219 / 255.0f, 237 / 255.0f, 242 / 255.0f, 1.0f);
-    this->background_light = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    this->background_light = glm::vec4(219 / 255.0f, 237 / 255.0f, 242 / 255.0f, 1.0f);
+    //this->background_light = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
 
-
-    
-    //SceneNode* example = new SceneNode();
-    //example->mesh = Mesh::Get("res/meshes/cube.obj");
-    //example->material = new StandardMaterial();
-    //this->node_list.push_back(example);
-
+    ////////////////////////// LAB 3 ////////////////////////////////
 
     SceneNode* volume = new SceneNode("Volume Node");
     volume->mesh = Mesh::Get("res/meshes/cube.obj");
-    volume->material = new VolumeMaterial();
 
-    volume->material->color = glm::vec4(151/255.0f, 57/255.0f, 196/255.0f, 1.0f);
+    VolumeMaterial* mat = new VolumeMaterial();
+    
+    mat->color = glm::vec4(151 / 255.0f, 57 / 255.0f, 196 / 255.0f, 1.0f);
+
+    char path[] = "C:/ACG/ACGFrameworkStudent/res/bunny_cloud.vdb";
+    //char path[] = "/res/bunny_cloud.vdb";
+
+    mat->loadVDB(path);
+
+    volume->material = mat;
 
     this->node_list.push_back(volume);
+
+    ////////////////////////// LAB 4 ////////////////////////////////
+
+    //
+    //SceneNode* conejo = new SceneNode("Volume Node");
+    //conejo->mesh = Mesh::Get("res/meshes/cube.obj");
+    //
+    //VolumeMaterial* mat = new VolumeMaterial();
+    //
+    //mat->color = glm::vec4(151 / 255.0f, 57 / 255.0f, 196 / 255.0f, 1.0f);
+
+    ////char path[] = "C:/ACG/ACGFrameworkStudent/res/bunny_cloud.vdb";
+    //char path[] = "/res/bunny_cloud.vdb";
+
+    //mat->loadVDB(path);
+
+
+    //conejo->material = mat;
+
+    //this->node_list.push_back(conejo);
+
+
 }
 
 void Application::update(float dt)

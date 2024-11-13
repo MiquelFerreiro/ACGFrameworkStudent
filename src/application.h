@@ -5,6 +5,9 @@
 #include "framework/scenenode.h"
 #include "framework/light.h"
 
+#include "../libraries/easyVDB/src/bbox.h"
+#include "../libraries/easyVDB/src/openvdbReader.h"
+
 #include <glm/vec2.hpp>
 
 class Application

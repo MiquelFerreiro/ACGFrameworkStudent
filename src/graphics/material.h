@@ -9,6 +9,9 @@
 #include "texture.h"
 #include "shader.h"
 
+#include "../libraries/easyVDB/src/bbox.h"
+#include "../libraries/easyVDB/src/openvdbReader.h"
+
 class Material {
 public:
 
@@ -61,11 +64,13 @@ public:
 class VolumeMaterial : public StandardMaterial {
 public:
 
-	int current_shader = 4;
+	int current_shader = 5;
 
 	Shader* abs_hom_shader = NULL;
 	Shader* abs_het_shader = NULL;
 	Shader* emi_abs_shader = NULL;
+
+	Shader* rabbit_shader = NULL;
 
 	float absorption_coef = 2.0f;
 	float step_length = 0.05f;
@@ -79,5 +84,9 @@ public:
 
 	void renderInMenu();
 
+	//Lab 4
 
+	void loadVDB(std::string file_path);
+
+	void estimate3DTexture(easyVDB::OpenVDBReader* vdbReader);
 };

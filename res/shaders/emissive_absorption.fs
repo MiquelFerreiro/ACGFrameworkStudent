@@ -107,7 +107,7 @@ void main() {
 
     float density = 0;
 
-    // Ray-marching loop for emission-absorption
+    // Ray-marching loop
     for (float t = tNear; t < tFar; t += u_step_length) {
 
         density = cnoise(position, u_noise_scale, u_noise_detail);
@@ -120,13 +120,12 @@ void main() {
 
         sum += transmittance * radiance * u_step_length;
 
-        // Advance position along the ray
+        // Advance position of the ray
         position += rayDir * u_step_length;
 
         // For calculating T(0,t)
         thickness += absorption * u_step_length;
     }
 
-    // Combine accumulated radiance with background color
     FragColor = sum + u_background_light * exp(-thickness);
 }
