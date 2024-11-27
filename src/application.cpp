@@ -43,16 +43,53 @@ void Application::init(GLFWwindow* window)
     this->node_list.push_back(volume);*/
 
     ////////////////////////// LAB 4 ////////////////////////////////
-    
-    SceneNode* volume = new SceneNode("Volume Node");
+    //
+    //SceneNode* volume = new SceneNode("Volume Node");
+    //volume->mesh = Mesh::Get("res/meshes/cube.obj");
+
+    //RabbitMaterial* mat = new RabbitMaterial();
+
+    //mat->color = glm::vec4(0.0f);
+
+    //// absolute path miquel
+    ////char path[] = "C:/ACG/ACGFrameworkStudent/res/bunny_cloud.vdb";
+
+    //// absolute path alex
+    //char path[] = "C:/Users/alexf/Documents/GitHub/ACGFrameworkStudent/res/bunny_cloud.vdb";
+
+    ////char path[] = "/res/bunny_cloud.vdb";
+
+    //mat->loadVDB(path);
+
+    //volume->material = mat;
+
+    //this->node_list.push_back(volume);
+    //   
+    //// LIGHT
+
+    //glm::vec3 light_pos = glm::vec3(1.5f);
+
+    //Light* light = new Light(light_pos, LIGHT_POINT);
+
+    //this->light_list.push_back(light);
+
+    //this->node_list.push_back(light);
+
+    // ///////////////////// LAB 5 ///////////////////////// //
+
+    SceneNode* volume = new SceneNode("Isosurface");
     volume->mesh = Mesh::Get("res/meshes/cube.obj");
 
-    RabbitMaterial* mat = new RabbitMaterial();
+    IsosurfaceMaterial* mat = new IsosurfaceMaterial();
 
-    mat->color = glm::vec4(0.0f);
+    mat->color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
 
-    // absolute path
-    char path[] = "C:/ACG/ACGFrameworkStudent/res/bunny_cloud.vdb";
+    // absolute path miquel
+    //char path[] = "C:/ACG/ACGFrameworkStudent/res/bunny_cloud.vdb";
+
+    // absolute path alex
+    char path[] = "C:/Users/alexf/Documents/GitHub/ACGFrameworkStudent/res/bunny_cloud.vdb";
+
     //char path[] = "/res/bunny_cloud.vdb";
 
     mat->loadVDB(path);
@@ -60,16 +97,6 @@ void Application::init(GLFWwindow* window)
     volume->material = mat;
 
     this->node_list.push_back(volume);
-       
-    // LIGHT
-
-    glm::vec3 light_pos = glm::vec3(1.5f);
-
-    Light* light = new Light(light_pos, LIGHT_POINT);
-
-    this->light_list.push_back(light);
-
-    this->node_list.push_back(light);
 
 
 }

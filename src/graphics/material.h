@@ -59,6 +59,12 @@ public:
 	void setUniforms(Camera* camera, glm::mat4 model);
 	void render(Mesh* mesh, glm::mat4 model, Camera* camera);
 	void renderInMenu();
+
+	//Lab 4
+
+	void loadVDB(std::string file_path);
+
+	void estimate3DTexture(easyVDB::OpenVDBReader* vdbReader);
 };
 
 class VolumeMaterial : public StandardMaterial {
@@ -108,12 +114,28 @@ public:
 
 	void renderInMenu();
 
-	//Lab 4
-
-	void loadVDB(std::string file_path);
-
-	void estimate3DTexture(easyVDB::OpenVDBReader* vdbReader);
-
 
 };
+
+
+class IsosurfaceMaterial : public StandardMaterial {
+public:
+
+
+	Shader* iso_shader = NULL;
+
+	float step_length = 0.05f;
+
+	float threshold = 1.0f;
+
+	bool jittering = false;
+
+	IsosurfaceMaterial(glm::vec4 color = glm::vec4(1.f));
+
+	void setUniforms(Camera* camera, glm::mat4 model);
+
+	void renderInMenu();
+
+};
+
 

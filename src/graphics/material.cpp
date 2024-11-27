@@ -340,7 +340,7 @@ void RabbitMaterial::renderInMenu()
 
 }
 
-void RabbitMaterial::loadVDB(std::string file_path)
+void StandardMaterial::loadVDB(std::string file_path)
 {
 	easyVDB::OpenVDBReader* vdbReader = new easyVDB::OpenVDBReader();
 	vdbReader->read(file_path);
@@ -349,7 +349,7 @@ void RabbitMaterial::loadVDB(std::string file_path)
 	estimate3DTexture(vdbReader);
 }
 
-void RabbitMaterial::estimate3DTexture(easyVDB::OpenVDBReader* vdbReader)
+void StandardMaterial::estimate3DTexture(easyVDB::OpenVDBReader* vdbReader)
 {
 	int resolution = 128;
 	float radius = 2.0;
@@ -462,4 +462,60 @@ void RabbitMaterial::estimate3DTexture(easyVDB::OpenVDBReader* vdbReader)
 		this->texture = new Texture();
 		this->texture->create3D(resolution, resolution, resolution, GL_RED, GL_FLOAT, false, data, GL_R8);
 	}
+}
+
+
+IsosurfaceMaterial::IsosurfaceMaterial(glm::vec4 color) {
+
+	this->color = color;
+
+	iso_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/isosurface.fs");
+
+	this->shader = iso_shader;
+
+
+}
+
+
+void IsosurfaceMaterial::setUniforms(Camera* camera, glm::mat4 model)
+{
+	//upload node uniforms
+	this->shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
+	this->shader->setUniform("u_camera_position", camera->eye);
+	this->shader->setUniform("u_model", model);
+
+	if (this->texture) {
+		this->shader->setUniform("u_texture", this->texture, 0);
+	}
+
+	this->shader->setUniform("u_color", this->color);
+
+
+	// STEP LENGTH
+	this->shader->setUniform("u_step_length", this->step_length);
+
+	// THRESHOLD
+	this->shader->setUniform("u_threshold", this->threshold);
+
+	// Jittering
+	this->shader->setUniform("u_use_jittering", this->jittering);
+
+
+
+}
+
+
+void IsosurfaceMaterial::renderInMenu()
+{
+
+
+
+	ImGui::DragFloat("Step Length", (float*)&this->step_length, 0.0005f, 0.005f);
+
+	ImGui::DragFloat("Threshold", (float*)&this->threshold, 0.01f);
+
+	ImGui::Checkbox("Use Jittering", &this->jittering);
+
+
+
 }
