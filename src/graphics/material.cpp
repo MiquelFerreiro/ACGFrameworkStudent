@@ -209,7 +209,7 @@ void VolumeMaterial::setUniforms(Camera* camera, glm::mat4 model)
 	this->shader->setUniform("u_model", model);
 
 	if (this->texture) {
-		this->shader->setUniform("u_texture", this->texture);
+		this->shader->setUniform("u_texture", this->texture, 0);
 	}
 
 	this->shader->setUniform("u_color", this->color);
@@ -225,6 +225,9 @@ void VolumeMaterial::setUniforms(Camera* camera, glm::mat4 model)
 
 	// NOISE DETAIL
 	this->shader->setUniform("u_noise_detail", this->noise_detail);
+
+	// SCAT COEF
+	this->shader->setUniform("u_scat_coef", this->scattering_coef);
 
 }
 
@@ -267,9 +270,77 @@ void VolumeMaterial::renderInMenu()
 
 	ImGui::DragFloat("Noise Detail", (float*)&this->noise_detail, 0.1f, 0.5);
 
+	ImGui::DragFloat("Scattering Coefficient", (float*)&this->scattering_coef, 0.1f, 0.5);
+
 }
 
-void VolumeMaterial::loadVDB(std::string file_path)
+RabbitMaterial::RabbitMaterial(glm::vec4 color) {
+
+	this->color = color;
+
+	rabbit_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/scattering.fs");
+
+	this->shader = rabbit_shader;
+
+
+}
+
+void RabbitMaterial::setUniforms(Camera* camera, glm::mat4 model)
+{
+	//upload node uniforms
+	this->shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
+	this->shader->setUniform("u_camera_position", camera->eye);
+	this->shader->setUniform("u_model", model);
+
+	if (this->texture) {
+		this->shader->setUniform("u_texture", this->texture, 0);
+	}
+
+	this->shader->setUniform("u_color", this->color);
+
+	// ABS COEF
+	this->shader->setUniform("u_abs_coef", this->absorption_coef);
+
+	// STEP LENGTH
+	this->shader->setUniform("u_step_length", this->step_length);
+
+	// NOISE SCALE
+	this->shader->setUniform("u_noise_scale", this->noise_scale);
+
+	// NOISE DETAIL
+	this->shader->setUniform("u_noise_detail", this->noise_detail);
+
+	// SCAT COEF
+	this->shader->setUniform("u_scat_coef", this->scattering_coef);
+
+
+	// Density Type
+	this->shader->setUniform("u_density_type", this->density_type);
+
+}
+
+void RabbitMaterial::renderInMenu()
+{
+	// Switch between Shaders
+
+	ImGui::Combo("Shader Type", &this->density_type, "Constant Density\0 3D Noise\0Rabbit");
+
+
+	if (!this->show_normals) ImGui::ColorEdit3("Color", (float*)&this->color);
+
+	ImGui::DragFloat("Absorption Coefficient", (float*)&this->absorption_coef, 0.025f, 0);
+
+	ImGui::DragFloat("Step Length", (float*)&this->step_length, 0.0005f, 0.005f);
+
+	ImGui::DragFloat("Noise Scale", (float*)&this->noise_scale, 0.1f, 0.5);
+
+	ImGui::DragFloat("Noise Detail", (float*)&this->noise_detail, 0.1f, 0.5);
+
+	ImGui::DragFloat("Scattering Coefficient", (float*)&this->scattering_coef, 0.1f, 0.5);
+
+}
+
+void RabbitMaterial::loadVDB(std::string file_path)
 {
 	easyVDB::OpenVDBReader* vdbReader = new easyVDB::OpenVDBReader();
 	vdbReader->read(file_path);
@@ -278,7 +349,7 @@ void VolumeMaterial::loadVDB(std::string file_path)
 	estimate3DTexture(vdbReader);
 }
 
-void VolumeMaterial::estimate3DTexture(easyVDB::OpenVDBReader* vdbReader)
+void RabbitMaterial::estimate3DTexture(easyVDB::OpenVDBReader* vdbReader)
 {
 	int resolution = 128;
 	float radius = 2.0;

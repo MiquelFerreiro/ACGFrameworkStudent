@@ -108,6 +108,7 @@ void main() {
     float density = 0;
 
     // Ray-marching loop
+    
     for (float t = tNear; t < tFar; t += u_step_length) {
 
         density = cnoise(position, u_noise_scale, u_noise_detail);

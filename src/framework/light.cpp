@@ -17,7 +17,9 @@ Light::Light(glm::vec3 position, eLightType type, float intensity, glm::vec4 col
 	this->cast_shadows;
 
 	// create a debug sphere mesh
+
 	this->mesh = Mesh::Get("res/meshes/sphere.obj");
+
 	this->model = glm::scale(this->model, glm::vec3(0.1f));
 	this->material = new FlatMaterial();
 }

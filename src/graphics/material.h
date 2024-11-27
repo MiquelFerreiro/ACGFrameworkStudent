@@ -77,8 +77,32 @@ public:
 	float noise_scale = 2.5f;
 	float noise_detail = 5.0f;
 
+	float scattering_coef = 0.0f;
+
 
 	VolumeMaterial(glm::vec4 color = glm::vec4(1.f));
+
+	void setUniforms(Camera* camera, glm::mat4 model);
+
+	void renderInMenu();
+};
+
+class RabbitMaterial : public StandardMaterial {
+public:
+
+	int density_type = 2;
+
+	Shader* rabbit_shader = NULL;
+
+	float absorption_coef = 2.0f;
+	float step_length = 0.1f;
+	float noise_scale = 2.5f;
+	float noise_detail = 5.0f;
+
+	float scattering_coef = 0.2f;
+
+
+	RabbitMaterial(glm::vec4 color = glm::vec4(1.f));
 
 	void setUniforms(Camera* camera, glm::mat4 model);
 
@@ -89,4 +113,7 @@ public:
 	void loadVDB(std::string file_path);
 
 	void estimate3DTexture(easyVDB::OpenVDBReader* vdbReader);
+
+
 };
+

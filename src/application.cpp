@@ -20,7 +20,7 @@ void Application::init(GLFWwindow* window)
     this->camera->lookAt(glm::vec3(1.f, 1.5f, 4.f), glm::vec3(0.f, 0.0f, 0.f), glm::vec3(0.f, 1.f, 0.f));
     this->camera->setPerspective(60.f, this->window_width / (float)this->window_height, 0.1f, 500.f); // set the projection, we want to be perspective
 
-    this->flag_grid = true;
+    this->flag_grid = false;
     this->flag_wireframe = false;
 
     this->ambient_light = glm::vec4(1, 1, 1, 1.0f);
@@ -31,13 +31,27 @@ void Application::init(GLFWwindow* window)
 
     ////////////////////////// LAB 3 ////////////////////////////////
 
-    SceneNode* volume = new SceneNode("Volume Node");
+    /*SceneNode* volume = new SceneNode("Volume Node");
     volume->mesh = Mesh::Get("res/meshes/cube.obj");
 
     VolumeMaterial* mat = new VolumeMaterial();
     
     mat->color = glm::vec4(151 / 255.0f, 57 / 255.0f, 196 / 255.0f, 1.0f);
 
+    volume->material = mat;
+
+    this->node_list.push_back(volume);*/
+
+    ////////////////////////// LAB 4 ////////////////////////////////
+    
+    SceneNode* volume = new SceneNode("Volume Node");
+    volume->mesh = Mesh::Get("res/meshes/cube.obj");
+
+    RabbitMaterial* mat = new RabbitMaterial();
+
+    mat->color = glm::vec4(0.0f);
+
+    // absolute path
     char path[] = "C:/ACG/ACGFrameworkStudent/res/bunny_cloud.vdb";
     //char path[] = "/res/bunny_cloud.vdb";
 
@@ -46,26 +60,16 @@ void Application::init(GLFWwindow* window)
     volume->material = mat;
 
     this->node_list.push_back(volume);
+       
+    // LIGHT
 
-    ////////////////////////// LAB 4 ////////////////////////////////
+    glm::vec3 light_pos = glm::vec3(1.5f);
 
-    //
-    //SceneNode* conejo = new SceneNode("Volume Node");
-    //conejo->mesh = Mesh::Get("res/meshes/cube.obj");
-    //
-    //VolumeMaterial* mat = new VolumeMaterial();
-    //
-    //mat->color = glm::vec4(151 / 255.0f, 57 / 255.0f, 196 / 255.0f, 1.0f);
+    Light* light = new Light(light_pos, LIGHT_POINT);
 
-    ////char path[] = "C:/ACG/ACGFrameworkStudent/res/bunny_cloud.vdb";
-    //char path[] = "/res/bunny_cloud.vdb";
+    this->light_list.push_back(light);
 
-    //mat->loadVDB(path);
-
-
-    //conejo->material = mat;
-
-    //this->node_list.push_back(conejo);
+    this->node_list.push_back(light);
 
 
 }
