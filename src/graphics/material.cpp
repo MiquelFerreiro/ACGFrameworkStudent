@@ -471,6 +471,8 @@ IsosurfaceMaterial::IsosurfaceMaterial(glm::vec4 color) {
 
 	iso_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/isosurface.fs");
 
+	iso_light_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/iso_light.fs");
+
 	this->shader = iso_shader;
 
 
@@ -500,7 +502,11 @@ void IsosurfaceMaterial::setUniforms(Camera* camera, glm::mat4 model)
 	// Jittering
 	this->shader->setUniform("u_use_jittering", this->jittering);
 
+	// Use Iso
+	this->shader->setUniform("u_use_isosurface", this->isosurface);
 
+	// h
+	this->shader->setUniform("u_h", this->h);
 
 }
 
@@ -508,13 +514,28 @@ void IsosurfaceMaterial::setUniforms(Camera* camera, glm::mat4 model)
 void IsosurfaceMaterial::renderInMenu()
 {
 
+	if (ImGui::Combo("Shader Type", &this->current_shader, "No illumination\0 Illumination")) {
 
+		switch (this->current_shader) {
+		case 0:
+			this->shader = this->iso_shader;
+			break;
+		case 1:
+			this->shader = this->iso_light_shader;
+			break;
+
+		}
+	}
 
 	ImGui::DragFloat("Step Length", (float*)&this->step_length, 0.0005f, 0.005f);
 
 	ImGui::DragFloat("Threshold", (float*)&this->threshold, 0.01f);
 
 	ImGui::Checkbox("Use Jittering", &this->jittering);
+
+	ImGui::Checkbox("Use Isosurface", &this->isosurface);
+
+	ImGui::DragFloat("Rate of Change (h)", (float*)&this->h, 0.0001f); 
 
 
 

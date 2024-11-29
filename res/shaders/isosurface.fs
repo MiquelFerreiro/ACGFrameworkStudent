@@ -20,6 +20,8 @@ uniform float u_threshold;
 
 uniform bool u_use_jittering;
 
+uniform bool u_use_isosurface;
+
 out vec4 FragColor;
 
 // ---------------------------------------------------------------------------------------------------//
@@ -53,7 +55,7 @@ void main() {
     
     if (u_use_jittering) {
 
-        ray_init_pos += random(gl_FragCoord.xy);
+        position += random(gl_FragCoord.xy) * u_step_length * rayDir;
 
     } 
 
@@ -66,11 +68,13 @@ void main() {
         
         sum += density;
 
-        if (sum > u_threshold) {
+        if (u_use_isosurface) {
+
+            if (sum > u_threshold) {
 
             final_color = u_color;
             break;
-
+            }
         }
 
         // Advance position along the ray
@@ -79,5 +83,11 @@ void main() {
     }
 
     // Final color calculation, combining accumulated radiance and background light
-    FragColor = final_color;
+
+    if (u_use_isosurface) {
+        FragColor = final_color;
+    }
+    else {
+        FragColor = u_background_light * exp(-sum * 2 * u_step_length);
+    }
 }

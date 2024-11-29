@@ -121,14 +121,21 @@ public:
 class IsosurfaceMaterial : public StandardMaterial {
 public:
 
+	int current_shader = 0;
 
 	Shader* iso_shader = NULL;
+
+	Shader* iso_light_shader = NULL;
 
 	float step_length = 0.05f;
 
 	float threshold = 1.0f;
 
 	bool jittering = false;
+
+	bool isosurface = true;
+
+	float h = 0.0001;
 
 	IsosurfaceMaterial(glm::vec4 color = glm::vec4(1.f));
 
