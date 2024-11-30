@@ -473,7 +473,15 @@ IsosurfaceMaterial::IsosurfaceMaterial(glm::vec4 color) {
 
 	iso_light_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/iso_light.fs");
 
-	this->shader = iso_shader;
+	switch (this->current_shader) {
+	case 0:
+		this->shader = this->iso_shader;
+		break;
+	case 1:
+		this->shader = this->iso_light_shader;
+		break;
+
+	}
 
 
 }
@@ -508,6 +516,15 @@ void IsosurfaceMaterial::setUniforms(Camera* camera, glm::mat4 model)
 	// h
 	this->shader->setUniform("u_h", this->h);
 
+	// ambient
+	this->shader->setUniform("u_ambient", this->ambient);
+
+	// ks
+	this->shader->setUniform("u_ks", this->ks);
+
+	// alpha
+	this->shader->setUniform("u_alpha", this->alpha);
+
 }
 
 
@@ -535,8 +552,14 @@ void IsosurfaceMaterial::renderInMenu()
 
 	ImGui::Checkbox("Use Isosurface", &this->isosurface);
 
-	ImGui::DragFloat("Rate of Change (h)", (float*)&this->h, 0.0001f); 
+	ImGui::DragFloat("Rate of Change (h)", (float*)&this->h, 0.001f); 
 
+	ImGui::ColorEdit3("Base Color", (float*)&this->color);
 
+	ImGui::ColorEdit3("Phong Ambient", (float*)&this->ambient);
+
+	ImGui::ColorEdit3("Phong Specular", (float*)&this->ks);
+
+	ImGui::DragFloat("Phong Alpha", (float*)&this->alpha, 0.1f);
 
 }

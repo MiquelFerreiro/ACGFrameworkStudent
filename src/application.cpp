@@ -106,6 +106,8 @@ void Application::init(GLFWwindow* window)
 
     Light* light = new Light(light_pos, LIGHT_POINT);
 
+    light->intensity = 3.0f;
+
     this->light_list.push_back(light);
 
     this->node_list.push_back(light);
@@ -121,6 +123,19 @@ void Application::update(float dt)
         this->camera->orbit(-delta.x * dt, delta.y * dt);
     }
     this->lastMousePosition = this->mousePosition;
+
+    // Move light source
+    {
+        static float angle = 0.0f;
+        angle += dt / 3;
+
+        float radius = 4.0f;
+
+        float x = radius * cos(angle);
+        float z = radius * sin(angle);
+
+        this->light_list[0]->model = glm::translate(glm::mat4(1.0f), glm::vec3(x, 1.0f, z));
+    }
 }
 
 void Application::render()

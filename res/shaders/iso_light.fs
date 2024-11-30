@@ -24,6 +24,9 @@ uniform vec3 u_light_direction;
 uniform vec3 u_light_position;
 uniform vec3 u_local_light_position;
 
+uniform vec3 u_ambient;   // Luz ambiental
+uniform vec3 u_ks;        // Coeficiente especular
+uniform float u_alpha;   // Brillo especular (shininess)
 
 out vec4 FragColor;
 
@@ -76,7 +79,7 @@ void main() {
 
             float visibility = 1.0;
 
-            vec4 radiance;
+            vec3 radiance;
 
             float dist = distance(u_light_position, position);
 
@@ -96,22 +99,23 @@ void main() {
                 }
             }
 
-            vec3 ambient = vec3(0.1);   // Luz ambiental
-            vec3 kd = vec3(0.8);        // Coeficiente difuso
-            vec3 ks = vec3(0.5);        // Coeficiente especular
-            float alpha = 1.0;    // Brillo especular (shininess)
+            vec3 kd = u_color.xyz;       // Coeficiente difuso
+            vec3 ambient = u_ambient.xyz;
+            vec3 ks = u_ks.xyz;
 
-            vec3 light_color = vec3(1.0);
+            vec3 light_color = u_light_color.xyz;
 
             vec3 wr = 2 * dot(wi, normal) * normal - wi;
 
-            vec3 phong_color = kd / 3.1416 + (3.1416 * 2 / (alpha +1)) * ks * pow(dot(wr, wo), alpha);
+            vec3 phong_color = kd / 3.1416 + (3.1416 * 2 / (u_alpha +1)) * ks * pow(dot(wr, wo), u_alpha);
 
-            radiance = visibility  * dot(wi, normal) * light_color * phong_color + ambient;
+            radiance = visibility  * dot(wi, normal) * light_color * phong_color * u_light_intensity + ambient;
 
-            FragColor = radiance;
+            FragColor = vec4(radiance, 1.0);
 
             fin = true;
+
+            break;
 
         }
 

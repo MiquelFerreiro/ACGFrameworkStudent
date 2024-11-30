@@ -121,7 +121,7 @@ public:
 class IsosurfaceMaterial : public StandardMaterial {
 public:
 
-	int current_shader = 0;
+	int current_shader = 1;
 
 	Shader* iso_shader = NULL;
 
@@ -136,6 +136,13 @@ public:
 	bool isosurface = true;
 
 	float h = 0.0001;
+
+	glm::vec4 ambient = glm::vec4(0.1, 0.1, 0.1, 1.0);
+
+	glm::vec4 ks = glm::vec4(0.5, 0.5, 0.5, 1.0);
+
+	float alpha = 1.0;
+
 
 	IsosurfaceMaterial(glm::vec4 color = glm::vec4(1.f));
 
